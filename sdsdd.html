@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yapay Zeka Atölyesi — Python, Görüntü İşleme ve Robotik Kodlama Eğitimleri</title>
+<meta name="description" content="Her yaşa uygun yüz yüze ve online eğitimler: Python, görüntü işleme (YOLO, OpenCV), Raspberry Pi, Arduino ve robotik kodlama. Ücretsiz tanışma dersi için WhatsApp'tan yazın.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#08181F;
+  --deep-2:#0E2630;
+  --paper:#F6F7F5;
+  --panel:#FFFFFF;
+  --ink:#0A1A22;
+  --muted:#5D6F79;
+  --line:#DCE2DE;
+  --amber:#F2B705;
+  --mint:#2FA69B;
+  --on-deep:#E8EFEC;
+  --on-deep-muted:#93A7AF;
+  --line-deep:rgba(232,239,236,.16);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0A181F;
+    --panel:#102229;
+    --ink:#E9F0ED;
+    --muted:#98AAB2;
+    --line:#1E333C;
+    --mint:#3FBDB0;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0A181F; --panel:#102229; --ink:#E9F0ED; --muted:#98AAB2;
+  --line:#1E333C; --mint:#3FBDB0;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;
+  font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+svg{max-width:100%;height:auto}
+a{color:inherit}
+.wrap{width:min(1180px,90vw);margin-inline:auto}
+
+h1,h2,h3,h4{font-family:"Sora",sans-serif;line-height:1.08;letter-spacing:-.03em;margin:0;font-weight:600}
+h1{font-size:clamp(2.6rem,6.2vw,4.6rem);font-weight:700}
+h2{font-size:clamp(2rem,4.2vw,3.1rem)}
+h3{font-size:1.25rem;letter-spacing:-.02em}
+p{margin:0 0 1rem}
+.lead{font-size:clamp(1.05rem,1.5vw,1.22rem);line-height:1.65;max-width:56ch}
+
+.eyebrow{font-family:"Sora",sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.02em;
+  color:var(--mint);display:flex;align-items:center;gap:.55rem;margin-bottom:1.1rem}
+.eyebrow::before{content:"";width:26px;height:2px;background:var(--amber);flex:none}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
+  padding:.95rem 1.5rem;border-radius:2px;text-decoration:none;font-weight:600;font-size:1rem;
+  font-family:"Sora",sans-serif;letter-spacing:-.01em;border:1.5px solid transparent;
+  transition:background .18s ease,color .18s ease,border-color .18s ease}
+.btn-primary{background:var(--amber);color:#08181F}
+.btn-primary:hover{background:#ffc93d}
+.btn-outline{border-color:var(--line-deep);color:var(--on-deep)}
+.btn-outline:hover{border-color:var(--on-deep)}
+.btn-dark{background:var(--deep);color:var(--on-deep)}
+.btn-dark:hover{background:var(--deep-2)}
+a:focus-visible,summary:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+
+/* ---------- header ---------- */
+header{position:absolute;top:0;left:0;right:0;z-index:50}
+.bar{display:flex;align-items:center;gap:2rem;padding:1.3rem 0;color:var(--on-deep)}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;
+  font-family:"Sora",sans-serif;font-weight:700;font-size:1.02rem;letter-spacing:-.02em;line-height:1.15}
+.brand small{display:block;font-family:"IBM Plex Sans",sans-serif;font-weight:400;font-size:.7rem;
+  letter-spacing:.14em;color:var(--on-deep-muted);text-transform:uppercase}
+nav{margin-inline-start:auto;display:flex;align-items:center;gap:2rem}
+nav a.nlink{text-decoration:none;font-size:.95rem;color:var(--on-deep-muted)}
+nav a.nlink:hover{color:var(--on-deep)}
+nav .btn{padding:.7rem 1.15rem;font-size:.92rem}
+@media(max-width:900px){nav a.nlink{display:none}}
+
+/* ---------- hero ---------- */
+.hero{background:var(--deep);color:var(--on-deep);padding:9rem 0 0;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:auto 0 0 0;height:1px;background:var(--line-deep)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(2rem,5vw,4.5rem);align-items:center;
+  padding-bottom:clamp(3rem,6vw,5rem)}
+@media(max-width:940px){.hero{padding-top:7.5rem}.hero-grid{grid-template-columns:1fr;gap:2.8rem}}
+.hero h1{margin-bottom:1.4rem}
+.hero .lead{color:var(--on-deep-muted)}
+.hero .eyebrow{color:var(--on-deep)}
+.actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line-deep)}
+@media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{padding:1.6rem 1.6rem 1.8rem;border-inline-end:1px solid var(--line-deep)}
+.stat:last-child{border-inline-end:0}
+@media(max-width:820px){.stat:nth-child(2n){border-inline-end:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--line-deep)}}
+.stat b{display:block;font-family:"Sora",sans-serif;font-size:1.45rem;font-weight:600;letter-spacing:-.03em}
+.stat span{font-size:.9rem;color:var(--on-deep-muted)}
+
+/* camera panel */
+.cam{background:var(--deep-2);border:1px solid var(--line-deep);border-radius:3px;padding:.85rem}
+.cam-top{display:flex;align-items:center;gap:.55rem;padding:.15rem .3rem .75rem;
+  font-family:"Sora",sans-serif;font-size:.76rem;color:var(--on-deep-muted);letter-spacing:.02em}
+.rec{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:blink 1.7s infinite}
+.cam-top .right{margin-inline-start:auto}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes boxIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.det{opacity:0;animation:boxIn .55s cubic-bezier(.2,.7,.3,1) forwards;transform-box:fill-box;transform-origin:center}
+.d1{animation-delay:.5s}.d2{animation-delay:.95s}.d3{animation-delay:1.4s}
+@keyframes scan{0%{transform:translateY(6px)}100%{transform:translateY(340px)}}
+.scanline{animation:scan 3.4s cubic-bezier(.45,0,.55,1) infinite alternate}
+@media(prefers-reduced-motion:reduce){.det,.scanline,.rec{animation:none;opacity:1}html{scroll-behavior:auto}}
+
+/* ---------- generic section ---------- */
+.section{padding:clamp(4.5rem,9vw,7.5rem) 0}
+.split{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:clamp(2rem,5vw,4.5rem);align-items:start}
+@media(max-width:940px){.split{grid-template-columns:1fr;gap:2.4rem}}
+.split-head h2{margin-bottom:1rem}
+.split-head p{color:var(--muted);margin:0}
+@media(min-width:941px){.split-head{position:sticky;top:2.5rem}}
+
+/* courses list */
+.list{border-top:1px solid var(--line)}
+.item{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:1.5rem;
+  padding:1.9rem 0;border-bottom:1px solid var(--line);align-items:start}
+@media(max-width:700px){.item{grid-template-columns:1fr;gap:.6rem;padding:1.6rem 0}}
+.item-title{display:flex;align-items:center;gap:.95rem}
+.item-title svg{flex:none}
+.item p{color:var(--muted);margin:0;font-size:.98rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.85rem}
+.chip{font-size:.78rem;letter-spacing:.01em;color:var(--muted);
+  border:1px solid var(--line);border-radius:2px;padding:.12rem .5rem}
+
+/* roadmap */
+.road{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);background:var(--panel)}
+@media(max-width:940px){.road{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.road{grid-template-columns:1fr}}
+.rstep{padding:2rem 1.5rem;border-inline-end:1px solid var(--line);position:relative}
+.rstep:last-child{border-inline-end:0}
+@media(max-width:940px){
+  .rstep:nth-child(2n){border-inline-end:0}
+  .rstep:nth-child(-n+2){border-bottom:1px solid var(--line)}
+}
+@media(max-width:560px){.rstep{border-inline-end:0;border-bottom:1px solid var(--line)}.rstep:last-child{border-bottom:0}}
+.rstep .age{font-family:"Sora",sans-serif;font-weight:700;font-size:2.1rem;letter-spacing:-.04em;line-height:1}
+.rstep h3{margin:.7rem 0 .5rem;font-size:1.08rem}
+.rstep p{color:var(--muted);font-size:.94rem;margin:0}
+.rstep::before{content:"";position:absolute;top:-1px;inset-inline-start:0;width:38%;height:3px;background:var(--amber)}
+
+/* dark band */
+.band{background:var(--deep);color:var(--on-deep)}
+.band .lead{color:var(--on-deep-muted)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-deep);
+  border:1px solid var(--line-deep);margin-top:3rem}
+@media(max-width:760px){.modes{grid-template-columns:1fr}}
+.mode{background:var(--deep);padding:clamp(1.8rem,3.5vw,2.6rem)}
+.mode h3{margin-bottom:1.1rem}
+.mode ul{margin:0;padding:0;list-style:none}
+.mode li{color:var(--on-deep-muted);font-size:.98rem;padding:.55rem 0 .55rem 1.6rem;position:relative}
+.mode li::before{content:"";position:absolute;inset-inline-start:0;top:1.05rem;width:8px;height:8px;background:var(--mint)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+@media(max-width:820px){.steps{grid-template-columns:1fr}}
+.step{padding:2.2rem 2rem 2.2rem 0;border-inline-end:1px solid var(--line)}
+.step:last-child{border-inline-end:0}
+@media(max-width:820px){.step{border-inline-end:0;border-bottom:1px solid var(--line);padding:1.8rem 0}
+  .step:last-child{border-bottom:0}}
+@media(min-width:821px){.step+.step{padding-inline-start:2rem}}
+.num{font-family:"Sora",sans-serif;font-weight:700;font-size:.85rem;color:var(--amber);display:block;margin-bottom:.9rem}
+.step h3{margin-bottom:.5rem}
+.step p{color:var(--muted);font-size:.96rem;margin:0}
+
+/* faq */
+details{border-bottom:1px solid var(--line)}
+details:first-of-type{border-top:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:1.5rem 2.5rem 1.5rem 0;position:relative;
+  font-family:"Sora",sans-serif;font-weight:600;font-size:1.1rem;letter-spacing:-.02em}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";position:absolute;inset-inline-end:.3rem;top:2rem;width:13px;height:13px;
+  border-inline-end:2px solid var(--mint);border-bottom:2px solid var(--mint);transform:rotate(45deg);transition:transform .2s}
+details[open] summary::after{transform:rotate(-135deg);top:2.3rem}
+details p{color:var(--muted);font-size:.99rem;max-width:70ch;padding-bottom:1.5rem;margin:0}
+
+/* contact */
+.cta{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(2rem,5vw,4rem);align-items:center}
+@media(max-width:860px){.cta{grid-template-columns:1fr;gap:2.2rem}}
+.card-lines{border:1px solid var(--line-deep)}
+.card-lines a{display:flex;gap:1rem;align-items:center;text-decoration:none;
+  padding:1.3rem 1.5rem;border-bottom:1px solid var(--line-deep)}
+.card-lines a:last-child{border-bottom:0}
+.card-lines a:hover{background:var(--deep-2)}
+.card-lines b{display:block;font-family:"Sora",sans-serif;font-weight:600;font-size:1.02rem;letter-spacing:-.02em}
+.card-lines span{font-size:.86rem;color:var(--on-deep-muted)}
+
+footer{background:var(--deep);color:var(--on-deep-muted);border-top:1px solid var(--line-deep);
+  padding:2.2rem 0 6rem;font-size:.9rem}
+.foot{display:flex;flex-wrap:wrap;gap:.7rem 2rem;justify-content:space-between;align-items:center}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--on-deep)}
+
+.float{position:fixed;inset-block-end:1.2rem;inset-inline-end:1.2rem;z-index:60;
+  display:flex;align-items:center;gap:.55rem;background:var(--amber);color:#08181F;
+  padding:.85rem 1.25rem;border-radius:2px;text-decoration:none;font-family:"Sora",sans-serif;font-weight:600;
+  box-shadow:0 14px 30px -12px rgba(0,0,0,.45)}
+.float:hover{background:#ffc93d}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="5.5" y="5.5" width="21" height="21" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+        <rect x="12.5" y="12.5" width="7" height="7" fill="#F2B705"/>
+        <path d="M11 5.5V2M21 5.5V2M11 30v-3.5M21 30v-3.5M5.5 11H2M5.5 21H2M30 11h-3.5M30 21h-3.5"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Yapay Zeka Atölyesi<small>Kodlama · Görüntü İşleme · Robotik</small></span>
+    </a>
+    <nav>
+      <a class="nlink" href="#egitimler">Eğitimler</a>
+      <a class="nlink" href="#yaslar">Yaş grupları</a>
+      <a class="nlink" href="#nasil">Nasıl başlanır</a>
+      <a class="btn btn-primary" href="https://wa.me/905433732055?text=Merhaba%2C%20e%C4%9Fitimler%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener">İletişime geçin</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Yüz yüze ve online · 7 yaş ve üzeri</div>
+        <h1>Gören, karar veren ve hareket eden sistemler kurmayı öğretiyoruz.</h1>
+        <p class="lead">Python ile başlıyor; kameranın gördüğünü tanıyan modeller, sensör okuyan kartlar ve kendi kendine yol bulan robotlarla devam ediyoruz. Her dönemin sonunda öğrencinin anlatabileceği bitmiş bir projesi oluyor.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://wa.me/905433732055?text=Merhaba%2C%20%C3%BCcretsiz%20tan%C4%B1%C5%9Fma%20dersi%20i%C3%A7in%20yaz%C4%B1yorum." target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2m5.8 14.16c-.24.68-1.42 1.32-1.96 1.36-.5.05-.96.23-3.23-.67-2.72-1.07-4.45-3.84-4.58-4.02-.13-.18-1.1-1.46-1.1-2.79s.7-1.98.95-2.25c.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.47.24.57.8 1.98.87 2.12.07.14.12.3.02.48-.09.18-.14.3-.28.46l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.45.2.52.32.07.11.07.65-.17 1.33"/></svg>
+            Ücretsiz tanışma dersi
+          </a>
+          <a class="btn btn-outline" href="#egitimler">Müfredatı inceleyin</a>
+        </div>
+      </div>
+
+      <div class="cam" role="img" aria-label="Kameranın gördüğü sahnede robot araba, Raspberry Pi ve Arduino kartının nesne tanıma kutularıyla işaretlendiği görsel">
+        <div class="cam-top"><i class="rec"></i> kamera 01 <span class="right">nesne tanıma · gerçek zamanlı</span></div>
+        <svg viewBox="0 0 540 380" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="pf" width="18" height="18" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.1" fill="rgba(232,239,236,.13)"/>
+            </pattern>
+            <clipPath id="cf"><rect width="540" height="380" rx="2"/></clipPath>
+          </defs>
+          <g clip-path="url(#cf)">
+            <rect width="540" height="380" fill="#0A1E27"/>
+            <rect width="540" height="380" fill="url(#pf)"/>
+            <rect x="0" y="300" width="540" height="80" fill="rgba(232,239,236,.05)"/>
+            <path d="M0 300h540" stroke="rgba(232,239,236,.18)" stroke-width="1"/>
+
+            <!-- robot araba -->
+            <g>
+              <rect x="58" y="190" width="148" height="74" rx="4" fill="#2FA69B"/>
+              <rect x="58" y="190" width="148" height="9" fill="#25867E"/>
+              <rect x="80" y="212" width="44" height="30" rx="2" fill="#0A1E27"/>
+              <rect x="138" y="212" width="44" height="30" rx="2" fill="#0A1E27"/>
+              <circle cx="102" cy="227" r="6" fill="#E8EFEC"/>
+              <circle cx="160" cy="227" r="6" fill="#E8EFEC"/>
+              <path d="M132 190v-30" stroke="#E8EFEC" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="132" cy="155" r="8" fill="#F2B705"/>
+              <circle cx="90" cy="272" r="22" fill="#12303C" stroke="#E8EFEC" stroke-width="3"/>
+              <circle cx="174" cy="272" r="22" fill="#12303C" stroke="#E8EFEC" stroke-width="3"/>
+            </g>
+
+            <!-- raspberry pi -->
+            <g>
+              <rect x="252" y="206" width="156" height="90" rx="3" fill="#15693F"/>
+              <rect x="262" y="214" width="124" height="10" rx="2" fill="#E8D06A"/>
+              <rect x="272" y="240" width="46" height="36" rx="2" fill="#0B3524"/>
+              <rect x="328" y="244" width="28" height="28" rx="2" fill="#0B3524"/>
+              <rect x="366" y="240" width="32" height="20" rx="2" fill="#8FA39B"/>
+              <rect x="366" y="266" width="32" height="16" rx="2" fill="#8FA39B"/>
+              <circle cx="260" cy="288" r="3.2" fill="#E8D06A"/><circle cx="400" cy="214" r="3.2" fill="#E8D06A"/>
+            </g>
+
+            <!-- arduino -->
+            <g>
+              <rect x="428" y="234" width="92" height="62" rx="3" fill="#0D5F72"/>
+              <rect x="436" y="240" width="64" height="9" rx="2" fill="#09424F"/>
+              <rect x="436" y="281" width="64" height="9" rx="2" fill="#09424F"/>
+              <rect x="450" y="257" width="32" height="16" rx="2" fill="#09424F"/>
+              <circle cx="510" cy="265" r="4" fill="#F2B705"/>
+            </g>
+
+            <!-- kutular -->
+            <g class="det d1">
+              <rect x="48" y="144" width="168" height="154" fill="none" stroke="#F2B705" stroke-width="2"/>
+              <rect x="48" y="122" width="168" height="22" fill="#F2B705"/>
+              <text x="57" y="138" font-family="Sora, sans-serif" font-size="13" fill="#08181F">robot araba · 0.97</text>
+            </g>
+            <g class="det d2">
+              <rect x="244" y="198" width="172" height="106" fill="none" stroke="#2FA69B" stroke-width="2"/>
+              <rect x="244" y="176" width="172" height="22" fill="#2FA69B"/>
+              <text x="253" y="192" font-family="Sora, sans-serif" font-size="13" fill="#08181F">raspberry pi · 0.95</text>
+            </g>
+            <g class="det d3">
+              <rect x="420" y="226" width="108" height="78" fill="none" stroke="#E8EFEC" stroke-width="2"/>
+              <rect x="420" y="204" width="108" height="22" fill="#E8EFEC"/>
+              <text x="429" y="220" font-family="Sora, sans-serif" font-size="13" fill="#08181F">arduino · 0.92</text>
+            </g>
+
+            <rect class="scanline" x="0" y="0" width="540" height="2" fill="#F2B705" opacity=".55"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><b>Birebir ve grup</b><span>En fazla 6 kişilik sınıflar</span></div>
+      <div class="stat"><b>Proje odaklı</b><span>Her dönem bitmiş bir çalışma</span></div>
+      <div class="stat"><b>7 yaş ve üzeri</b><span>Çocuk, lise ve yetişkin programları</span></div>
+      <div class="stat"><b>Yüz yüze + online</b><span>Canlı ders, kayıtlı video değil</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="egitimler">
+  <div class="wrap split">
+    <div class="split-head">
+      <div class="eyebrow">Müfredat</div>
+      <h2>Eğitim başlıkları</h2>
+      <p>Öğrencilerin çoğu Python ile başlıyor, ardından ilgisine göre görüntü işleme ya da donanım tarafına ilerliyor. Başlangıç noktasını tanışma dersinde birlikte belirliyoruz.</p>
+    </div>
+
+    <div class="list">
+      <article class="item">
+        <div class="item-title">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M12 10 6 16l6 6" fill="none" stroke="var(--mint)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 10l6 6-6 6" fill="none" stroke="var(--mint)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 8l-4 16" stroke="var(--amber)" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+          <h3>Python</h3>
+        </div>
+        <div>
+          <p>Değişken ve döngülerden fonksiyonlara, dosya işlemeden kütüphane kullanımına kadar temel programlama. Her konu küçük bir programla bitiyor, ezber yok.</p>
+          <div class="chips"><span class="chip">Başlangıç</span><span class="chip">Tüm yaşlar</span><span class="chip">Online uygun</span></div>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-title">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="2.5" y="7" width="27" height="18" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="16" cy="16" r="6" fill="none" stroke="var(--mint)" stroke-width="2.2"/>
+            <circle cx="16" cy="16" r="2.2" fill="var(--amber)"/>
+          </svg>
+          <h3>Görüntü İşleme — OpenCV</h3>
+        </div>
+        <div>
+          <p>Kameradan görüntü almak, renk ve şekil yakalamak, hareket ve yüz tespiti. Görüntünün aslında bir sayı tablosu olduğunu anlamakla başlıyoruz.</p>
+          <div class="chips"><span class="chip">OpenCV</span><span class="chip">Python ön koşul</span></div>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-title">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="2.5" y="5.5" width="27" height="21" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <rect x="7" y="12" width="11" height="10" fill="none" stroke="var(--amber)" stroke-width="2.2"/>
+            <rect x="19" y="16" width="8" height="7" fill="none" stroke="var(--mint)" stroke-width="2.2"/>
+          </svg>
+          <h3>Nesne Tanıma — YOLO</h3>
+        </div>
+        <div>
+          <p>Hazır modelleri çalıştırmaktan kendi veri setini etiketleyip eğitmeye kadar. Dönem sonunda öğrencinin seçtiği nesneyi tanıyan kendi modeli çıkıyor.</p>
+          <div class="chips"><span class="chip">YOLO</span><span class="chip">Veri etiketleme</span><span class="chip">İleri seviye</span></div>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-title">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="3.5" y="7.5" width="25" height="17" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <rect x="7.5" y="10.5" width="14" height="3" fill="var(--amber)"/>
+            <rect x="8" y="16" width="8" height="6" fill="var(--mint)"/>
+            <rect x="19" y="16.5" width="6" height="5" fill="none" stroke="var(--mint)" stroke-width="2"/>
+          </svg>
+          <h3>Raspberry Pi</h3>
+        </div>
+        <div>
+          <p>Linux'a giriş, GPIO ile sensör ve motor kontrolü, kamerayı bağlayıp görüntü işleyen bağımsız bir sistem kurmak.</p>
+          <div class="chips"><span class="chip">Donanım</span><span class="chip">Yüz yüze önerilir</span></div>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-title">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="3.5" y="10" width="25" height="13" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <rect x="7" y="6.5" width="18" height="3.5" fill="var(--mint)"/>
+            <rect x="7" y="23" width="18" height="3.5" fill="var(--mint)"/>
+            <circle cx="16" cy="16.5" r="3.2" fill="var(--amber)"/>
+          </svg>
+          <h3>Arduino</h3>
+        </div>
+        <div>
+          <p>Devre kurmak, sensör okumak, motor ve röle sürmek. Elektroniğe hiç dokunmamış bir öğrenci için en hızlı ve en somut başlangıç.</p>
+          <div class="chips"><span class="chip">Elektronik</span><span class="chip">Başlangıç</span></div>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-title">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="7" y="10" width="18" height="14" rx="3" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="13" cy="17" r="2.2" fill="var(--mint)"/><circle cx="19" cy="17" r="2.2" fill="var(--mint)"/>
+            <path d="M16 10V6" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="16" cy="4.5" r="2.5" fill="var(--amber)"/>
+            <path d="M7 28h18" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h3>Robotik Kodlama</h3>
+        </div>
+        <div>
+          <p>Çizgi izleyen, engelden kaçan ve uzaktan kumanda edilen robotlar. Mekanik, elektronik ve yazılımın aynı anda yürüdüğü en keyifli başlık.</p>
+          <div class="chips"><span class="chip">Takım çalışması</span><span class="chip">Yarışma hazırlığı</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="yaslar" style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow">Yaş grupları</div>
+    <h2 style="max-width:18ch;margin-bottom:1.2rem">Her yaş için ayrı bir yol haritası</h2>
+    <p class="lead" style="color:var(--muted);margin-bottom:2.6rem">Aynı içeriği herkese anlatmıyoruz. Öğrencinin yaşı ve daha önce ne yaptığı, nereden başlayacağımızı belirliyor.</p>
+    <div class="road">
+      <div class="rstep">
+        <div class="age">7–10</div>
+        <h3>İlk temas</h3>
+        <p>Blok kodlama, basit robot kitleri ve sensörlerle oyun. Amaç, ekranda yaptığının gerçek dünyadaki karşılığını görmek.</p>
+      </div>
+      <div class="rstep">
+        <div class="age">11–14</div>
+        <h3>Koda geçiş</h3>
+        <p>Python temelleri ve Arduino. Kendi yazdığı kodla ışık yakıyor, motor döndürüyor, ilk robotunu kuruyor.</p>
+      </div>
+      <div class="rstep">
+        <div class="age">15–18</div>
+        <h3>Proje üretimi</h3>
+        <p>OpenCV ve YOLO ile görüntü işleme, Raspberry Pi üzerinde çalışan projeler, yarışma ve portfolyo hazırlığı.</p>
+      </div>
+      <div class="rstep">
+        <div class="age">18+</div>
+        <h3>Yetişkin programı</h3>
+        <p>Sıfırdan Python, yapay zekâ temelleri ve kendi işinize uyarlanabilir görüntü işleme çözümleri. Akşam ve hafta sonu saatleri.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section band">
+  <div class="wrap">
+    <div class="eyebrow">Ders biçimi</div>
+    <h2 style="max-width:20ch">İki şekilde ders alabilirsiniz</h2>
+    <p class="lead" style="margin-top:1.1rem">Donanım ağırlıklı konularda atölyede olmak avantajlı; yazılım tarafı online da aynı verimle ilerliyor.</p>
+    <div class="modes">
+      <div class="mode">
+        <h3>Atölyede yüz yüze</h3>
+        <ul>
+          <li>En fazla 6 kişilik gruplar ya da birebir ders</li>
+          <li>Lehim, montaj ve devre kurulumu birlikte yapılır</li>
+          <li>Eğitmen aynı masada, anında geri bildirim</li>
+          <li>Hafta içi akşam ve hafta sonu saatleri</li>
+        </ul>
+      </div>
+      <div class="mode">
+        <h3>Online canlı ders</h3>
+        <ul>
+          <li>Kamera ve ekran paylaşımıyla canlı ders</li>
+          <li>Ders kayıtları tekrar izlemek için paylaşılır</li>
+          <li>Türkiye'nin ve yurt dışının her yerinden katılım</li>
+          <li>Ders arası soru desteği WhatsApp üzerinden</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="nasil">
+  <div class="wrap">
+    <div class="eyebrow">Süreç</div>
+    <h2 style="max-width:16ch;margin-bottom:2.6rem">Nasıl başlanır</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="num">01</span>
+        <h3>WhatsApp'tan yazın</h3>
+        <p>Öğrencinin yaşını ve daha önce kod yazıp yazmadığını belirtmeniz yeterli. Aynı gün dönüş yapıyoruz.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h3>Tanışma dersine katılın</h3>
+        <p>Ücretsiz, 40 dakikalık bir ders yapıyoruz. Öğrenci bu derste de küçük bir şey çalıştırıyor; sadece konuşmuyoruz.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h3>Programı seçip başlayın</h3>
+        <p>Seviyeye uygun yol haritasını ve ders saatlerini birlikte belirliyoruz, ertesi hafta derslere başlıyoruz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="wrap split">
+    <div class="split-head">
+      <div class="eyebrow">Sorular</div>
+      <h2>Sık sorulanlar</h2>
+      <p>Aklınıza takılan başka bir şey varsa WhatsApp'tan yazmanız yeterli.</p>
+    </div>
+    <div>
+      <details open>
+        <summary>Çocuğumun hiç kod bilgisi yok, olur mu?</summary>
+        <p>Olur, öğrencilerin çoğu sıfırdan başlıyor. Yaşına uygun bir başlangıç noktası seçiyoruz; ilk derste ne yapabildiğini görüp devamını ona göre planlıyoruz.</p>
+      </details>
+      <details>
+        <summary>Dersler ne kadar sürüyor, kaç kişi oluyor?</summary>
+        <p>Dersler haftada bir gün, ortalama 90 dakika. Gruplar en fazla 6 kişi; isterseniz birebir de ilerleyebilirsiniz.</p>
+      </details>
+      <details>
+        <summary>Yetişkinler için de uygun mu?</summary>
+        <p>Evet. Yetişkin programında Python, yapay zekâ ve görüntü işleme konularını doğrudan kendi işinize uygulayabileceğiniz örneklerle işliyoruz. Akşam ve hafta sonu saatleri mevcut.</p>
+      </details>
+      <details>
+        <summary>Online derste de proje yapılabiliyor mu?</summary>
+        <p>Evet. Python, OpenCV ve YOLO tarafındaki projelerin tamamı online yürüyor. Kart ve sensör gerektiren konularda ekran paylaşımıyla adım adım birlikte ilerliyoruz.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section band" id="iletisim">
+  <div class="wrap cta">
+    <div>
+      <div class="eyebrow">İletişim</div>
+      <h2>Tanışma dersi için bir mesaj yeterli</h2>
+      <p class="lead" style="margin-top:1.1rem">Öğrencinin yaşını yazın; size uygun programı ve ilk boş ders saatini birlikte belirleyelim.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="https://wa.me/905433732055?text=Merhaba%2C%20e%C4%9Fitimler%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2m5.8 14.16c-.24.68-1.42 1.32-1.96 1.36-.5.05-.96.23-3.23-.67-2.72-1.07-4.45-3.84-4.58-4.02-.13-.18-1.1-1.46-1.1-2.79s.7-1.98.95-2.25c.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.47.24.57.8 1.98.87 2.12.07.14.12.3.02.48-.09.18-.14.3-.28.46l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.45.2.52.32.07.11.07.65-.17 1.33"/></svg>
+          WhatsApp'tan yazın
+        </a>
+      </div>
+    </div>
+    <div class="card-lines">
+      <a href="https://wa.me/905433732055" target="_blank" rel="noopener">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#F2B705" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2m5.8 14.16c-.24.68-1.42 1.32-1.96 1.36-.5.05-.96.23-3.23-.67-2.72-1.07-4.45-3.84-4.58-4.02-.13-.18-1.1-1.46-1.1-2.79s.7-1.98.95-2.25c.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.47.24.57.8 1.98.87 2.12.07.14.12.3.02.48-.09.18-.14.3-.28.46l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.45.2.52.32.07.11.07.65-.17 1.33"/></svg>
+        <span><b>+90 543 373 20 55</b><span>WhatsApp · en hızlı yanıt</span></span>
+      </a>
+      <a href="mailto:bilgi@yapayzekatolye.com">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2FA69B" stroke-width="2" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14"/><path d="m3 7 9 6 9-6"/></svg>
+        <span><b>bilgi@yapayzekatolye.com</b><span>E-posta ile ulaşın</span></span>
+      </a>
+      <a href="https://yapayzekatolye.com">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2FA69B" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M3 12h18M12 2.8c2.5 2.6 2.5 15.8 0 18.4M12 2.8c-2.5 2.6-2.5 15.8 0 18.4"/></svg>
+        <span><b>yapayzekatolye.com</b><span>Yapay Zeka Atölyesi</span></span>
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="yil">2026</span> Yapay Zeka Atölyesi</span>
+    <span>Python · Görüntü işleme · Raspberry Pi · Arduino · Robotik kodlama</span>
+    <span><a href="mailto:bilgi@yapayzekatolye.com">bilgi@yapayzekatolye.com</a></span>
+  </div>
+</footer>
+
+<a class="float" href="https://wa.me/905433732055?text=Merhaba%2C%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener" aria-label="WhatsApp'tan mesaj gönderin">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2m5.8 14.16c-.24.68-1.42 1.32-1.96 1.36-.5.05-.96.23-3.23-.67-2.72-1.07-4.45-3.84-4.58-4.02-.13-.18-1.1-1.46-1.1-2.79s.7-1.98.95-2.25c.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.47.24.57.8 1.98.87 2.12.07.14.12.3.02.48-.09.18-.14.3-.28.46l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.45.2.52.32.07.11.07.65-.17 1.33"/></svg>
+  Yazın
+</a>
+
+<script>document.getElementById('yil').textContent=new Date().getFullYear();</script>
+</body>
+</html>
