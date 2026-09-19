@@ -1,7 +1,9 @@
 // /api/files.js
 // Ders materyali (PDF vb.) yükleme/listeleme/silme API'si.
-// Dosyanın kendisi Vercel Blob'da saklanır (BLOB_READ_WRITE_TOKEN,
-// Storage → Blob veritabanını projeye bağladığınızda otomatik eklenir).
+// Dosyanın kendisi Vercel Blob'da saklanır. Blob store'u projeye bağladığınızda
+// Vercel otomatik olarak BLOB_STORE_ID ekler ve kimlik doğrulamayı OIDC ile
+// (VERCEL_OIDC_TOKEN, otomatik yenilenir) kendisi halleder — @vercel/blob SDK'sı
+// bunu kendiliğinden kullanır, elle bir token girmenize gerek yok.
 // Dosya listesi (ad, boyut, link) Vercel KV'de saklanır — notes.js ile aynı KV.
 
 const { put, del } = require('@vercel/blob');
@@ -55,7 +57,7 @@ module.exports = async (req, res) => {
     });
     return;
   }
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  if (!process.env.BLOB_STORE_ID) {
     res.status(500).json({
       error:
         'Blob depolama bağlı değil. Vercel projenizde Storage → Blob'
