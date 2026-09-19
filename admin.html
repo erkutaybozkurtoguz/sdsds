@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Ders Notları — Yönetim</title>
+<meta name="robots" content="noindex, nofollow"/>
+<meta name="theme-color" content="#050A17"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050A17; --bg-2:#08102A; --panel:#0B1533; --panel-2:#0F1C42;
+  --line:rgba(132,166,255,.16); --line-strong:rgba(132,166,255,.34);
+  --text:#E9EEFF; --muted:#9DABCB;
+  --blue:#3A82FF; --cyan:#2BD4FF; --amber:#FFB224; --red:#FF6B6B;
+  --display:"Chakra Petch",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.6;
+  min-height:100vh;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);margin:0;font-weight:600;letter-spacing:-.01em}
+.wrap{width:min(880px,92vw);margin-inline:auto;padding:3rem 0 5rem}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:2.2rem;flex-wrap:wrap}
+.top h1{font-size:1.55rem}
+.top span{color:var(--muted);font-size:.92rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem 1.3rem;border-radius:999px;
+  border:1.5px solid transparent;font-family:var(--display);font-weight:600;font-size:.92rem;cursor:pointer;
+  text-decoration:none;transition:background .2s,border-color .2s,transform .15s}
+.btn-primary{background:var(--amber);color:#1A1200}
+.btn-primary:hover{background:#ffc247;transform:translateY(-1px)}
+.btn-ghost{border-color:var(--line-strong);color:var(--text);background:rgba(255,255,255,.03)}
+.btn-ghost:hover{border-color:var(--cyan);background:rgba(43,212,255,.08)}
+.btn-danger{border-color:rgba(255,107,107,.5);color:#FFB4B4;background:rgba(255,107,107,.07);padding:.45rem .9rem;font-size:.82rem}
+.btn-danger:hover{background:rgba(255,107,107,.16)}
+.btn[disabled]{opacity:.5;cursor:default;pointer-events:none}
+
+input,textarea{
+  width:100%;padding:.75rem .9rem;border-radius:12px;border:1px solid var(--line);background:rgba(5,10,23,.55);
+  color:var(--text);font-family:var(--body);font-size:.96rem;transition:border-color .2s}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,textarea:focus{outline:none;border-color:var(--cyan)}
+textarea{resize:vertical;min-height:110px;line-height:1.6}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-bottom:.4rem}
+
+/* gate */
+.gate{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.gate-card{width:min(360px,90vw);border:1px solid var(--line);border-radius:22px;background:rgba(11,21,51,.6);
+  padding:2rem 1.8rem;text-align:center}
+.gate-card h1{font-size:1.3rem;margin-bottom:.5rem}
+.gate-card p{color:var(--muted);font-size:.9rem;margin:0 0 1.4rem}
+.gate-card input{margin-bottom:.9rem}
+.gate-err{color:#FFB4B4;font-size:.85rem;min-height:1.2em;margin-top:.7rem}
+
+/* form panel */
+.panel{border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,rgba(15,28,66,.7),rgba(11,21,51,.85));
+  padding:1.7rem 1.8rem;margin-bottom:2.2rem}
+.panel h2{font-size:1.15rem;margin-bottom:1.2rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:620px){.grid2{grid-template-columns:1fr}}
+.field{margin-bottom:1rem}
+.form-actions{display:flex;gap:.7rem;margin-top:.4rem;flex-wrap:wrap}
+
+/* notes list */
+.notes{display:flex;flex-direction:column;gap:14px}
+.note{border:1px solid var(--line);border-radius:18px;background:rgba(11,21,51,.5);padding:1.3rem 1.5rem;transition:border-color .2s}
+.note:hover{border-color:var(--line-strong)}
+.note-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.5rem}
+.note-head h3{font-size:1.05rem;line-height:1.35}
+.note-meta{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.7rem}
+.tag{font-size:.76rem;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.15rem .65rem;
+  background:rgba(255,255,255,.03);white-space:nowrap}
+.tag.date{color:#8CE8FF;border-color:rgba(43,212,255,.4);background:rgba(43,212,255,.08)}
+.note-body{color:#C4CFEA;font-size:.95rem;line-height:1.65;white-space:pre-wrap}
+.note-actions{display:flex;gap:.6rem;margin-top:1rem}
+.note-actions .btn-ghost{padding:.4rem .85rem;font-size:.82rem}
+
+.empty{border:1px dashed var(--line-strong);border-radius:18px;padding:2.4rem 1.5rem;text-align:center;color:var(--muted)}
+.status{font-size:.85rem;color:var(--muted);min-height:1.2em;margin:.6rem 0 0}
+.status.err{color:#FFB4B4}
+.status.ok{color:#8CE8FF}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <div class="gate-card">
+    <h1>Ders Notları</h1>
+    <p>Bu sayfa gizli. Devam etmek için şifreyi girin.</p>
+    <input id="pwInput" type="password" placeholder="Şifre" autocomplete="current-password"/>
+    <button class="btn btn-primary" id="pwBtn" style="width:100%">Giriş yap</button>
+    <div class="gate-err" id="gateErr"></div>
+  </div>
+</div>
+
+<div id="app" class="wrap hidden">
+  <div class="top">
+    <div>
+      <h1>Ders Notları</h1>
+      <span id="countLabel">—</span>
+    </div>
+    <button class="btn btn-ghost" id="logoutBtn">Çıkış yap</button>
+  </div>
+
+  <div class="panel">
+    <h2 id="formTitle">Yeni not</h2>
+    <div class="grid2">
+      <div class="field">
+        <label for="fTitle">Başlık</label>
+        <input id="fTitle" type="text" placeholder="Örn: Ahmet — Python 3. ders"/>
+      </div>
+      <div class="field">
+        <label for="fStudent">Öğrenci (opsiyonel)</label>
+        <input id="fStudent" type="text" placeholder="Öğrenci adı"/>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label for="fDate">Ders tarihi (opsiyonel)</label>
+        <input id="fDate" type="date"/>
+      </div>
+      <div></div>
+    </div>
+    <div class="field">
+      <label for="fContent">Not</label>
+      <textarea id="fContent" placeholder="Ders içeriği, öğrencinin nerede kaldığı, sıradaki konu..."></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" id="saveBtn">Notu kaydet</button>
+      <button class="btn btn-ghost hidden" id="cancelEditBtn">Düzenlemeyi iptal et</button>
+    </div>
+    <div class="status" id="formStatus"></div>
+  </div>
+
+  <div id="notesList" class="notes"></div>
+  <div id="emptyState" class="empty hidden">Henüz not eklenmedi.</div>
+</div>
+
+<script>
+(function(){
+  var API = '/api/notes';
+  var pwKey = 'yza_admin_pw';
+  var editingId = null;
+
+  var gate = document.getElementById('gate');
+  var app = document.getElementById('app');
+  var pwInput = document.getElementById('pwInput');
+  var pwBtn = document.getElementById('pwBtn');
+  var gateErr = document.getElementById('gateErr');
+  var logoutBtn = document.getElementById('logoutBtn');
+
+  var fTitle = document.getElementById('fTitle');
+  var fStudent = document.getElementById('fStudent');
+  var fDate = document.getElementById('fDate');
+  var fContent = document.getElementById('fContent');
+  var saveBtn = document.getElementById('saveBtn');
+  var cancelEditBtn = document.getElementById('cancelEditBtn');
+  var formTitle = document.getElementById('formTitle');
+  var formStatus = document.getElementById('formStatus');
+  var notesList = document.getElementById('notesList');
+  var emptyState = document.getElementById('emptyState');
+  var countLabel = document.getElementById('countLabel');
+
+  function getPw(){ return sessionStorage.getItem(pwKey) || ''; }
+  function setPw(v){ sessionStorage.setItem(pwKey, v); }
+  function clearPw(){ sessionStorage.removeItem(pwKey); }
+
+  function api(method, body, qs){
+    return fetch(API + (qs || ''), {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-password': getPw()
+      },
+      body: body ? JSON.stringify(body) : undefined
+    }).then(function(res){
+      return res.json().then(function(data){
+        if(!res.ok) throw new Error(data.error || ('Hata: ' + res.status));
+        return data;
+      });
+    });
+  }
+
+  function showApp(){
+    gate.classList.add('hidden');
+    app.classList.remove('hidden');
+    loadNotes();
+  }
+  function showGate(msg){
+    app.classList.add('hidden');
+    gate.classList.remove('hidden');
+    gateErr.textContent = msg || '';
+    pwInput.focus();
+  }
+
+  pwBtn.addEventListener('click', function(){
+    var v = pwInput.value.trim();
+    if(!v) return;
+    setPw(v);
+    gateErr.textContent = 'Kontrol ediliyor...';
+    api('GET').then(function(){
+      gateErr.textContent='';
+      showApp();
+    }).catch(function(err){
+      clearPw();
+      gateErr.textContent = err.message.indexOf('401') > -1 || /şifre/i.test(err.message) ? 'Şifre yanlış.' : err.message;
+    });
+  });
+  pwInput.addEventListener('keydown', function(e){ if(e.key==='Enter') pwBtn.click(); });
+
+  logoutBtn.addEventListener('click', function(){
+    clearPw();
+    showGate('');
+  });
+
+  function esc(s){
+    return (s||'').replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; });
+  }
+
+  function fmtDate(d){
+    if(!d) return '';
+    var parts = d.split('-');
+    if(parts.length!==3) return d;
+    return parts[2] + '.' + parts[1] + '.' + parts[0];
+  }
+
+  function renderNotes(notes){
+    notesList.innerHTML = '';
+    if(!notes.length){
+      emptyState.classList.remove('hidden');
+      countLabel.textContent = 'Henüz not yok';
+      return;
+    }
+    emptyState.classList.add('hidden');
+    countLabel.textContent = notes.length + ' not';
+    notes.forEach(function(n){
+      var el = document.createElement('div');
+      el.className = 'note';
+      var meta = '';
+      if(n.lessonDate) meta += '<span class="tag date">' + esc(fmtDate(n.lessonDate)) + '</span>';
+      if(n.student) meta += '<span class="tag">' + esc(n.student) + '</span>';
+      el.innerHTML =
+        '<div class="note-head"><h3>' + esc(n.title) + '</h3></div>' +
+        (meta ? '<div class="note-meta">' + meta + '</div>' : '') +
+        '<div class="note-body">' + esc(n.content) + '</div>' +
+        '<div class="note-actions">' +
+          '<button class="btn btn-ghost" data-act="edit">Düzenle</button>' +
+          '<button class="btn btn-danger" data-act="delete">Sil</button>' +
+        '</div>';
+      el.querySelector('[data-act="edit"]').addEventListener('click', function(){ startEdit(n); });
+      el.querySelector('[data-act="delete"]').addEventListener('click', function(){ removeNote(n.id); });
+      notesList.appendChild(el);
+    });
+  }
+
+  function loadNotes(){
+    api('GET').then(function(data){
+      renderNotes(data.notes || []);
+    }).catch(function(err){
+      if(/401|şifre/i.test(err.message)){ clearPw(); showGate('Oturum sona erdi, tekrar giriş yapın.'); }
+      else { formStatus.textContent = err.message; formStatus.className='status err'; }
+    });
+  }
+
+  function startEdit(n){
+    editingId = n.id;
+    fTitle.value = n.title;
+    fStudent.value = n.student || '';
+    fDate.value = n.lessonDate || '';
+    fContent.value = n.content;
+    formTitle.textContent = 'Notu düzenle';
+    saveBtn.textContent = 'Değişiklikleri kaydet';
+    cancelEditBtn.classList.remove('hidden');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function resetForm(){
+    editingId = null;
+    fTitle.value=''; fStudent.value=''; fDate.value=''; fContent.value='';
+    formTitle.textContent = 'Yeni not';
+    saveBtn.textContent = 'Notu kaydet';
+    cancelEditBtn.classList.add('hidden');
+  }
+  cancelEditBtn.addEventListener('click', resetForm);
+
+  saveBtn.addEventListener('click', function(){
+    var title = fTitle.value.trim();
+    var content = fContent.value.trim();
+    if(!title || !content){
+      formStatus.textContent = 'Başlık ve not alanı zorunlu.';
+      formStatus.className = 'status err';
+      return;
+    }
+    var payload = {
+      title: title,
+      content: content,
+      student: fStudent.value.trim(),
+      lessonDate: fDate.value
+    };
+    saveBtn.disabled = true;
+    var req = editingId
+      ? api('PUT', Object.assign({id: editingId}, payload))
+      : api('POST', payload);
+    req.then(function(){
+      formStatus.textContent = 'Kaydedildi.';
+      formStatus.className = 'status ok';
+      resetForm();
+      loadNotes();
+    }).catch(function(err){
+      formStatus.textContent = err.message;
+      formStatus.className = 'status err';
+    }).finally(function(){
+      saveBtn.disabled = false;
+    });
+  });
+
+  function removeNote(id){
+    if(!confirm('Bu notu silmek istediğinize emin misiniz?')) return;
+    api('DELETE', null, '?id=' + encodeURIComponent(id)).then(function(){
+      loadNotes();
+    }).catch(function(err){
+      alert(err.message);
+    });
+  }
+
+  // başlangıç: kayıtlı şifre var mı kontrol et
+  if(getPw()){
+    api('GET').then(function(){ showApp(); }).catch(function(){ clearPw(); showGate(''); });
+  } else {
+    showGate('');
+  }
+})();
+</script>
+</body>
+</html>
