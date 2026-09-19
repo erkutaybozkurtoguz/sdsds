@@ -6,7 +6,7 @@
 // bunu kendiliğinden kullanır, elle bir token girmenize gerek yok.
 // Dosya listesi (ad, boyut, link) Vercel KV'de saklanır — notes.js ile aynı KV.
 
-const { put, del } = require('@vercel/blob');
+const { put, del, get } = require('@vercel/blob');
 
 const KV_URL = process.env.KV_REST_API_URL;
 const KV_TOKEN = process.env.KV_REST_API_TOKEN;
@@ -71,6 +71,16 @@ module.exports = async (req, res) => {
   }
 
   try {
+    if (req.method === 'GET' && req.query && req.query.download) {
+      const pathname = req.query.download;
+      const { stream, blob } = await get(pathname, { access: 'private' });
+      var displayName = (blob.pathname || pathname).split('/').pop();
+      res.setHeader('Content-Type', blob.contentType || 'application/octet-stream');
+      res.setHeader('Content-Disposition', 'attachment; filename="' + displayName.replace(/"/g, '') + '"');
+      stream.pipe(res);
+      return;
+    }
+
     if (req.method === 'GET') {
       const files = await kvGet(FILES_KEY);
       files.sort((a, b) => b.uploadedAt - a.uploadedAt);
@@ -93,16 +103,16 @@ module.exports = async (req, res) => {
       }
 
       const blob = await put(`ders-materyalleri/${Date.now()}-${name}`, buffer, {
-        access: 'public',
+        access: 'private',
         contentType: mimeType || 'application/octet-stream',
         addRandomSuffix: true,
       });
 
       const files = await kvGet(FILES_KEY);
       const record = {
-        id: blob.url,
+        id: blob.pathname,
         name,
-        url: blob.url,
+        pathname: blob.pathname,
         size: buffer.length,
         mimeType: mimeType || '',
         uploadedAt: Date.now(),
