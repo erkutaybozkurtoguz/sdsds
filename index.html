@@ -335,15 +335,6 @@ footer{border-top:1px solid var(--line);padding:2.4rem 0 6.5rem;color:var(--mute
 <div class="v-stage"><canvas id="scene" aria-hidden="true"></canvas></div>
 <div class="v-bottom" aria-hidden="true">
 <div class="code">
-<span class="ln"><span class="k">from</span> ultralytics <span class="k">import</span> YOLO</span>
-<span class="ln">model = <span class="f">YOLO</span>(<span class="s">"yolov8n.pt"</span>)</span>
-<span class="ln"> </span>
-<span class="ln"><span class="k">for</span> kare <span class="k">in</span> kamera:</span>
-<span class="ln">    nesneler = <span class="f">model</span>(kare)</span>
-<span class="ln">    <span class="k">if</span> <span class="s">"insan"</span> <span class="k">in</span> nesneler <span class="k">and</span> bolgede:</span>
-<span class="ln" id="l-stop">        robot.<span class="f">dur</span>()</span>
-<span class="ln">    <span class="k">else</span>:</span>
-<span class="ln" id="l-go">        robot.<span class="f">ilerle</span>()</span>
 </div>
 <div class="flow">
 <div class="fl see"><small>Görüyor</small><b id="f-see">araç, insan, İHA</b></div>
@@ -369,7 +360,6 @@ footer{border-top:1px solid var(--line);padding:2.4rem 0 6.5rem;color:var(--mute
 <div class="wrap">
 <div class="sec-head">
 <h2>Eğitim başlıkları</h2>
-<p>Öğrencilerin çoğu Python ile başlıyor, ardından ilgisine göre görüntü işleme ya da donanım tarafına ilerliyor. Başlangıç noktasını tanışma dersinde birlikte belirliyoruz.</p>
 </div>
 
 <div class="bento">
