@@ -79,6 +79,24 @@ label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-b
 .note-actions{display:flex;gap:.6rem;margin-top:1rem}
 .note-actions .btn-ghost{padding:.4rem .85rem;font-size:.82rem}
 
+/* dosya yükleme */
+.upload-row{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}
+.file-pick{position:relative;overflow:hidden;flex:1;min-width:200px}
+.file-pick input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-pick-label{display:flex;align-items:center;gap:.6rem;padding:.75rem .9rem;border-radius:12px;
+  border:1px dashed var(--line-strong);background:rgba(5,10,23,.4);color:var(--muted);font-size:.9rem}
+.file-pick.has-file .file-pick-label{color:var(--text);border-style:solid;border-color:var(--line)}
+.hint{font-size:.8rem;color:var(--muted);margin-top:.5rem}
+.files{display:flex;flex-direction:column;gap:10px}
+.file-row{display:flex;align-items:center;gap:1rem;border:1px solid var(--line);border-radius:16px;
+  padding:.9rem 1.1rem;background:rgba(11,21,51,.5)}
+.file-ico{flex:none;width:38px;height:38px;border-radius:10px;background:rgba(58,130,255,.14);
+  display:grid;place-items:center;color:var(--cyan)}
+.file-info{flex:1;min-width:0}
+.file-info b{display:block;font-size:.95rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-info span{font-size:.8rem;color:var(--muted)}
+.file-row .btn-ghost{padding:.4rem .85rem;font-size:.82rem}
+
 .empty{border:1px dashed var(--line-strong);border-radius:18px;padding:2.4rem 1.5rem;text-align:center;color:var(--muted)}
 .status{font-size:.85rem;color:var(--muted);min-height:1.2em;margin:.6rem 0 0}
 .status.err{color:#FFB4B4}
@@ -139,6 +157,22 @@ label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-b
 
   <div id="notesList" class="notes"></div>
   <div id="emptyState" class="empty hidden">Henüz not eklenmedi.</div>
+
+  <div class="panel" style="margin-top:2.6rem">
+    <h2>Ders materyalleri</h2>
+    <div class="upload-row">
+      <label class="file-pick" id="filePick">
+        <input id="fileInput" type="file" accept="application/pdf,image/*,.doc,.docx,.ppt,.pptx,.zip"/>
+        <span class="file-pick-label" id="filePickLabel">Dosya seçin (PDF, görsel, Word, PowerPoint...)</span>
+      </label>
+      <button class="btn btn-primary" id="uploadBtn">Yükle</button>
+    </div>
+    <div class="hint">En fazla 3MB. Daha büyük dosyalar için ayrıca haber verin, o kısmı büyütelim.</div>
+    <div class="status" id="uploadStatus"></div>
+  </div>
+
+  <div id="filesList" class="files" style="margin-top:1rem"></div>
+  <div id="filesEmpty" class="empty hidden">Henüz dosya yüklenmedi.</div>
 </div>
 
 <script>
@@ -170,8 +204,8 @@ label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-b
   function setPw(v){ sessionStorage.setItem(pwKey, v); }
   function clearPw(){ sessionStorage.removeItem(pwKey); }
 
-  function api(method, body, qs){
-    return fetch(API + (qs || ''), {
+  function api(method, body, qs, endpoint){
+    return fetch((endpoint || API) + (qs || ''), {
       method: method,
       headers: {
         'Content-Type': 'application/json',
@@ -186,10 +220,120 @@ label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-b
     });
   }
 
+  var FILES_API = '/api/files';
+  var fileInput = document.getElementById('fileInput');
+  var filePick = document.getElementById('filePick');
+  var filePickLabel = document.getElementById('filePickLabel');
+  var uploadBtn = document.getElementById('uploadBtn');
+  var uploadStatus = document.getElementById('uploadStatus');
+  var filesList = document.getElementById('filesList');
+  var filesEmpty = document.getElementById('filesEmpty');
+
+  fileInput.addEventListener('change', function(){
+    var f = fileInput.files[0];
+    if(f){
+      filePick.classList.add('has-file');
+      filePickLabel.textContent = f.name + ' (' + fmtSize(f.size) + ')';
+    } else {
+      filePick.classList.remove('has-file');
+      filePickLabel.textContent = 'Dosya seçin (PDF, görsel, Word, PowerPoint...)';
+    }
+  });
+
+  function fmtSize(bytes){
+    if(bytes < 1024) return bytes + ' B';
+    if(bytes < 1024*1024) return Math.round(bytes/1024) + ' KB';
+    return (bytes/1024/1024).toFixed(1) + ' MB';
+  }
+
+  function fileToBase64(file){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(){
+        var result = reader.result || '';
+        var idx = result.indexOf(',');
+        resolve(idx > -1 ? result.slice(idx+1) : result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  uploadBtn.addEventListener('click', function(){
+    var f = fileInput.files[0];
+    if(!f){
+      uploadStatus.textContent = 'Önce bir dosya seçin.';
+      uploadStatus.className = 'status err';
+      return;
+    }
+    if(f.size > 3*1024*1024){
+      uploadStatus.textContent = 'Dosya 3MB sınırını aşıyor.';
+      uploadStatus.className = 'status err';
+      return;
+    }
+    uploadBtn.disabled = true;
+    uploadStatus.textContent = 'Yükleniyor...';
+    uploadStatus.className = 'status';
+    fileToBase64(f).then(function(b64){
+      return api('POST', { name: f.name, mimeType: f.type, dataBase64: b64 }, '', FILES_API);
+    }).then(function(){
+      uploadStatus.textContent = 'Yüklendi.';
+      uploadStatus.className = 'status ok';
+      fileInput.value = '';
+      filePick.classList.remove('has-file');
+      filePickLabel.textContent = 'Dosya seçin (PDF, görsel, Word, PowerPoint...)';
+      loadFiles();
+    }).catch(function(err){
+      uploadStatus.textContent = err.message;
+      uploadStatus.className = 'status err';
+    }).finally(function(){
+      uploadBtn.disabled = false;
+    });
+  });
+
+  function renderFiles(files){
+    filesList.innerHTML = '';
+    if(!files.length){
+      filesEmpty.classList.remove('hidden');
+      return;
+    }
+    filesEmpty.classList.add('hidden');
+    files.forEach(function(f){
+      var el = document.createElement('div');
+      el.className = 'file-row';
+      el.innerHTML =
+        '<span class="file-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>' +
+        '<div class="file-info"><b>' + esc(f.name) + '</b><span>' + fmtSize(f.size) + ' · ' + new Date(f.uploadedAt).toLocaleDateString('tr-TR') + '</span></div>' +
+        '<a class="btn btn-ghost" href="' + f.url + '" target="_blank" rel="noopener">İndir</a>' +
+        '<button class="btn btn-danger" data-act="del-file">Sil</button>';
+      el.querySelector('[data-act="del-file"]').addEventListener('click', function(){ removeFile(f.id); });
+      filesList.appendChild(el);
+    });
+  }
+
+  function loadFiles(){
+    api('GET', null, '', FILES_API).then(function(data){
+      renderFiles(data.files || []);
+    }).catch(function(err){
+      uploadStatus.textContent = err.message;
+      uploadStatus.className = 'status err';
+    });
+  }
+
+  function removeFile(id){
+    if(!confirm('Bu dosyayı silmek istediğinize emin misiniz?')) return;
+    api('DELETE', null, '?id=' + encodeURIComponent(id), FILES_API).then(function(){
+      loadFiles();
+    }).catch(function(err){
+      alert(err.message);
+    });
+  }
+
   function showApp(){
     gate.classList.add('hidden');
     app.classList.remove('hidden');
     loadNotes();
+    loadFiles();
   }
   function showGate(msg){
     app.classList.add('hidden');
