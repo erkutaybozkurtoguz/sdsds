@@ -299,9 +299,17 @@ details p{color:var(--muted);font-size:.99rem;max-width:64ch;padding:0 1.4rem 1.
 footer{border-top:1px solid var(--line);padding:2.4rem 0 6.5rem;color:var(--muted);font-size:.92rem}
 .foot{display:grid;gap:1.4rem}
 .foot-top{display:flex;flex-wrap:wrap;gap:1rem 2rem;align-items:center;justify-content:space-between}
-.foot .brand{color:var(--text)}
-.foot a:not(.brand){text-decoration:none}
+.foot .brand{color:var(--text);flex-shrink:0}
+.foot a:not(.brand){text-decoration:none;white-space:nowrap;flex-shrink:0}
 .foot a:not(.brand):hover{color:var(--text)}
+@media(max-width:480px){
+  .foot-top{gap:.6rem 1rem}
+  .foot a:not(.brand){font-size:.82rem}
+}
+@media(max-width:360px){
+  .foot .brand span{display:none}
+  .foot a:not(.brand){font-size:.78rem}
+}
 .foot-tags{display:flex;flex-wrap:wrap;gap:.45rem}
 .foot-tags span{border:1px solid var(--line);border-radius:999px;padding:.15rem .7rem;font-size:.8rem}
 
