@@ -129,7 +129,7 @@ nav .btn{padding:.65rem 1.2rem;font-size:.92rem;white-space:nowrap}
 
 /* ---------- sections ---------- */
 .section{padding:clamp(4rem,8vw,7rem) 0;scroll-margin-top:70px}
-.sec-head{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem clamp(2rem,5vw,4.5rem);align-items:end;margin-bottom:clamp(2rem,4vw,3rem)}
+.sec-head{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem clamp(2rem,5vw,4.5rem);align-items:start;margin-bottom:clamp(2rem,4vw,3rem)}
 @media(max-width:860px){.sec-head{grid-template-columns:1fr}}
 .sec-head p{color:var(--muted);margin:0;max-width:52ch}
 .sec-head.solo{grid-template-columns:1fr;gap:1rem}
@@ -382,12 +382,10 @@ footer{border-top:1px solid var(--line);padding:2.4rem 0 6.5rem;color:var(--mute
 <!-- ================= CURRICULUM ================= -->
 <section class="section" id="egitimler" style="padding-top:clamp(2.4rem,4vw,3.4rem)">
 <div class="wrap">
-<div class="sec-head">
-<div>
+<div class="sec-head" style="grid-template-columns:1fr;text-align:center;justify-items:center">
 <span class="pill"><i aria-hidden="true"></i>Program içeriği</span>
 <h2>Eğitim başlıkları</h2>
-</div>
-<p>Aşağıdaki başlıkların <b style="color:var(--text);font-weight:600">tamamı her yaş grubuna uygun şekilde ayrı ayrı anlatılıyor</b>: içerik aynı, anlatım ve proje zorluğu öğrencinin yaşına göre değişiyor. Öğrencilerin çoğu Python ile başlıyor, ardından ilgisine göre görüntü işleme ya da donanım tarafına ilerliyor.</p>
+<p style="max-width:62ch;margin-top:.6rem">Aşağıdaki başlıkların <b style="color:var(--text);font-weight:600">tamamı her yaş grubuna uygun şekilde ayrı ayrı anlatılıyor</b>: içerik aynı, anlatım ve proje zorluğu öğrencinin yaşına göre değişiyor. Öğrencilerin çoğu Python ile başlıyor, ardından ilgisine göre görüntü işleme ya da donanım tarafına ilerliyor.</p>
 </div>
 
 <div class="bento">
